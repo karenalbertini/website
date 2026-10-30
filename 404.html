@@ -128,13 +128,33 @@
         font-weight: 600;
         font-size: clamp(1.4rem, 4vw, 1.9rem);
         line-height: 1.3;
-        margin: 18px 0 10px;
-        min-height: 2.6em;
+        margin: 0 0 6px;
         transition: opacity 0.25s;
       }
 
-      h1.fading {
+      h1:lang(ja) {
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      }
+
+      .translation {
+        font-size: 0.92rem;
+        font-style: italic;
+        color: var(--lavender);
+        margin: 0;
+        transition: opacity 0.25s;
+      }
+
+      .fading {
         opacity: 0;
+      }
+
+      /* keeps the buttons from jumping when the phrase changes length */
+      .phrase-box {
+        min-height: 6.4em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 14px 0 16px;
       }
 
       p {
@@ -227,7 +247,10 @@
       </svg>
 
       <div class="code">404</div>
-      <h1 id="phrase" aria-live="polite">This page failed its tolerance check.</h1>
+      <div class="phrase-box">
+        <h1 id="phrase" aria-live="polite">This page failed its tolerance check.</h1>
+        <div id="translation" class="translation"></div>
+      </div>
       <p>The page you're looking for doesn't exist — or it's still somewhere in the CAD model.</p>
 
       <div class="buttons">
@@ -237,26 +260,46 @@
     </main>
 
     <script>
+      // lang + an English translation for the French and Japanese lines
       const phrases = [
-        "This page failed its tolerance check.",
-        "We ran the tests. This page did not pass.",
-        "This page exceeded its yield strength.",
-        "Measured twice, cut once — and it's still missing.",
-        "Part number not found in the bill of materials.",
-        "The valve to this page seems to be closed.",
-        "This page is still in the CAD model and never made it to production.",
-        "Someone forgot to tighten this page's screws.",
-        "This page went into the CNC machine and came out as chips.",
-        "Error 404 — in French, Japanese, German and English.",
-        "Even a seam ripper can't fix this one.",
-        "This page is currently being optimised. Indefinitely.",
-        "Have you tried turning it off and on again?",
-        "This gear is missing a tooth. So is this page.",
+        { text: "This page failed its tolerance check." },
+        { text: "We ran the tests. This page did not pass." },
+        { text: "This page exceeded its yield strength." },
+        { text: "Measured twice, cut once — and it's still missing." },
+        { text: "Part number not found in the bill of materials." },
+        { text: "The valve to this page seems to be closed." },
+        { text: "This page is still in the CAD model and never made it to production." },
+        { text: "Someone forgot to tighten this page's screws." },
+        { text: "This page went into the CNC machine and came out as chips." },
+        { text: "Error 404 — in French, Japanese, German and English." },
+        { text: "Even a seam ripper can't fix this one." },
+        { text: "This page is currently being optimised. Indefinitely." },
+        { text: "Have you tried turning it off and on again?" },
+        { text: "This gear is missing a tooth. So is this page." },
+        { text: "Oups ! Cette page est partie en pause café.", lang: "fr", note: "Oops! This page went on a coffee break." },
+        { text: "Il manque une vis quelque part.", lang: "fr", note: "There's a screw missing somewhere." },
+        { text: "Cette page n'existe pas. Enfin… pas encore.", lang: "fr", note: "This page doesn't exist. Well… not yet." },
+        { text: "Houston, on a un problème.", lang: "fr", note: "Houston, we have a problem." },
+        { text: "C'est en forgeant qu'on devient forgeron.", lang: "fr", note: "Practice makes perfect — this page is still practising." },
+        { text: "このページは迷子になりました。", lang: "ja", note: "This page got lost." },
+        { text: "猿も木から落ちる。", lang: "ja", note: "Even monkeys fall from trees." },
+        { text: "ネジが一本足りないようです。", lang: "ja", note: "Looks like we're one screw short." },
+        { text: "このページは只今カイゼン中です。", lang: "ja", note: "This page is currently undergoing kaizen." },
+        { text: "七転び八起き。", lang: "ja", note: "Fall down seven times, get up eight." },
       ];
 
       const phrase = document.getElementById("phrase");
+      const translation = document.getElementById("translation");
       let current = Math.floor(Math.random() * phrases.length);
-      phrase.textContent = phrases[current];
+
+      function show(index) {
+        const { text, lang = "en", note = "" } = phrases[index];
+        phrase.textContent = text;
+        phrase.lang = lang;
+        translation.textContent = note;
+      }
+
+      show(current);
 
       document.getElementById("another").addEventListener("click", () => {
         let next;
@@ -266,9 +309,11 @@
         current = next;
 
         phrase.classList.add("fading");
+        translation.classList.add("fading");
         setTimeout(() => {
-          phrase.textContent = phrases[current];
+          show(current);
           phrase.classList.remove("fading");
+          translation.classList.remove("fading");
         }, 250);
       });
     </script>
